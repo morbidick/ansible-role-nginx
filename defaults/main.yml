@@ -1,0 +1,22 @@
+---
+nginx_identifier: nginx
+
+nginx_dhparam_folder: "/etc/nginx/ssl"
+nginx_dhparam_file: "{{ nginx_dhparam_folder }}/dhparam.pem"
+nginx_ssl_protocols: "TLSv1 TLSv1.1 TLSv1.2"
+nginx_ssl_ciphers: |-
+  ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-DSS-AES128-GCM-SHA256:kEDH+AESGCM:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA:ECDHE-ECDSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-DSS-AES128-SHA256:DHE-RSA-AES256-SHA256:DHE-DSS-AES256-SHA:DHE-RSA-AES256-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:AES:CAMELLIA:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!PSK:!aECDH:!EDH-DSS-DES-CBC3-SHA:!EDH-RSA-DES-CBC3-SHA:!KRB5-DES-CBC3-SHA:!DES-CBC3-SHA
+
+nginx_conf_folder: "/etc/nginx"
+nginx_conf_file: "{{nginx_conf_folder }}/nginx.conf"
+nginx_sites_availabe_folder: "{{nginx_conf_folder }}/sites-available"
+nginx_sites_enabled_folder: "{{nginx_conf_folder }}/sites-enabled"
+
+nginx_snippet_folder: "{{ nginx_conf_folder }}/snippets"
+nginx_snippet_acme: "{{ nginx_snippet_folder }}/acme.conf"
+nginx_snippet_ssl: "{{ nginx_snippet_folder }}/ssl.conf"
+
+nginx_create_default_page: true
+nginx_default_page_config_file: "default.conf"
+nginx_default_page_folder: "/var/www/default"
+nginx_default_page_content: "<h1>Nginx configured by Ansible</h1>"

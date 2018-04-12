@@ -1,0 +1,80 @@
+---
+- name: update apt cache
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+  when: ansible_pkg_mgr == "apt"
+
+- name: install nginx and dependencies
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - nginx
+    - openssl
+
+- name: create config folders
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ nginx_dhparam_folder }}"
+    - "{{ nginx_conf_folder }}"
+    - "{{ nginx_snippet_folder }}"
+    - "{{ nginx_sites_availabe_folder }}"
+    - "{{ nginx_sites_enabled_folder }}"
+
+- name: generate dhparam file
+  shell: "openssl dhparam -out {{ nginx_dhparam_file }} 2048"
+  args:
+    creates: "{{ nginx_dhparam_file }}"
+
+- name: generate config files
+  template:
+    dest: "{{ item.dest }}"
+    src: "{{ item.src }}"
+  notify: reload nginx
+  with_items:
+    - dest: "{{ nginx_conf_file }}"
+      src: "etc/nginx/nginx.conf"
+    - dest: "{{ nginx_snippet_ssl }}"
+      src: "etc/nginx/snippets/ssl.conf"
+    - dest: "{{ nginx_snippet_acme }}"
+      src: "etc/nginx/snippets/acme.conf"
+
+- name: remove dist configs and folders
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - "/etc/nginx/sites-available/default"
+    - "/etc/nginx/sites-enabled/default"
+    - "/var/www/html"
+  when: nginx_create_default_page
+
+- name: create default page folder
+  file:
+    path: "{{ nginx_default_page_folder }}"
+    state: directory
+  when: nginx_create_default_page
+
+- name: create default page index
+  copy:
+    content: "{{ nginx_default_page_content }}"
+    dest: "{{ nginx_default_page_folder }}/index.html"
+  when: nginx_create_default_page
+
+- name: create default page config
+  template:
+    dest: "{{ nginx_sites_availabe_folder }}/{{ nginx_default_page_config_file }}"
+    src: "etc/nginx/sites-available/default.conf"
+  notify: reload nginx
+  when: nginx_create_default_page
+
+- name: activate default page config
+  file:
+    src: "{{ nginx_sites_availabe_folder }}/{{ nginx_default_page_config_file }}"
+    dest: "{{ nginx_sites_enabled_folder }}/{{ nginx_default_page_config_file }}"
+    state: link
+  notify: reload nginx
+  when: nginx_create_default_page
