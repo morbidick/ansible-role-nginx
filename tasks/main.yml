@@ -78,3 +78,10 @@
     state: link
   notify: reload nginx
   when: nginx_create_default_page
+
+# handlers are only executed at the end of a play https://github.com/ansible/ansible/issues/15476
+- name: reload nginx
+  service:
+    name: "{{ nginx_identifier }}"
+    state: reloaded
+    
